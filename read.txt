@@ -1,0 +1,127 @@
+// normal ---> diagonal flip \
+// A8 B8 C8 D8 E8 F8 G8 H8     A8 A7 A6 A5 A4 A3 A2 A1 
+// A7 B7 C7 D7 E7 F7 G7 H7     B8 B7 B6 B5 B4 B3 B2 B1 
+// A6 B6 C6 D6 E6 F6 G6 H6     C8 C7 C6 C5 C4 C3 C2 C1
+// A5 B5 C5 D5 E5 F5 G5 H5     D8 D7 D6 D5 D4 D3 D2 D1
+// A4 B4 C4 D4 E4 F4 G4 H4     E8 E7 E6 E5 E4 E3 E2 E1
+// A3 B3 C3 D3 E3 F3 G3 H3     F8 F7 F6 F5 F4 F3 F2 F1
+// A2 B2 C2 D2 E2 F2 G2 H2     G8 G7 G6 G5 G4 G3 G2 G1
+// A1 B1 C1 D1 E1 F1 G1 H1     H8 H7 H6 H5 H4 H3 H2 H1
+
+// normal ---> horizontal flip
+// A8 B8 C8 D8 E8 F8 G8 H8      H8 G8 F8 E8 D8 C8 B8 A8
+// A7 B7 C7 D7 E7 F7 G7 H7      H7 G7 F7 E7 D7 C7 B7 A7
+// A6 B6 C6 D6 E6 F6 G6 H6      H6 G6 F6 E6 D6 C6 B6 A6
+// A5 B5 C5 D5 E5 F5 G5 H5      H5 G5 F5 E5 D5 C5 B5 A5
+// A4 B4 C4 D4 E4 F4 G4 H4      H4 G4 F4 E4 D4 C4 B4 A4
+// A3 B3 C3 D3 E3 F3 G3 H3      H3 G3 F3 E3 D3 C3 B3 A3
+// A2 B2 C2 D2 E2 F2 G2 H2      H2 G2 F2 E2 D2 C2 B2 A2
+// A1 B1 C1 D1 E1 F1 G1 H1      H1 G1 F1 E1 D1 C1 B1 A1
+
+// normal ---> vertical flip
+// A8 B8 C8 D8 E8 F8 G8 H8      A1 B1 C1 D1 E1 F1 G1 H1
+// A7 B7 C7 D7 E7 F7 G7 H7      A2 B2 C2 D2 E2 F2 G2 H2 
+// A6 B6 C6 D6 E6 F6 G6 H6      A3 B3 C3 D3 E3 F3 G3 H3 
+// A5 B5 C5 D5 E5 F5 G5 H5      A4 B4 C4 D4 E4 F4 G4 H4
+// A4 B4 C4 D4 E4 F4 G4 H4      A5 B5 C5 D5 E5 F5 G5 H5 
+// A3 B3 C3 D3 E3 F3 G3 H3      A6 B6 C6 D6 E6 F6 G6 H6 
+// A2 B2 C2 D2 E2 F2 G2 H2      A7 B7 C7 D7 E7 F7 G7 H7 
+// A1 B1 C1 D1 E1 F1 G1 H1      A8 B8 C8 D8 E8 F8 G8 H8
+
+
+unsigned int mv =  0b00010000;
+unsigned int op =  0b00101010;
+unsigned int pl =  0b01000001;
+unsigned int lmask = ~((mv << 1) - 1);
+unsigned int rmask = mv - 1;
+unsigned int test = 0b1010;
+// struct MoveTable* move_table = generate_move_table();
+// unsigned int move = (unsigned int)move_table->moves[index(i,j)];
+// std::cout << std::bitset<8> (move) << std::endl;
+std::cout << "move                                      " << bin(mv) << std::endl;
+std::cout << "player                                    " << bin(pl) << std::endl;
+std::cout << "opponent                                  " << bin(op) << std::endl;
+std::cout << "move - 1 (right mask)                     " << bin(rmask) << std::endl;
+std::cout << "~(move << 1) (left mask)                  " << bin(lmask) << std::endl;
+std::cout << "spaces between player and move (right)    " << bin(rmask & ~pl) << std::endl;
+std::cout << "spaces between player and move (left)     " << bin(lmask & ~pl) << std::endl;
+std::cout << "test                                      " << bin(std::__bit_ceil(test)) << std::endl;
+
+
+Definiition and rotation of diagonals:
+    the 11 key diagonals are defined from the top left corner down
+
+    _  _  0  1  2  3  4  5          _  6  6  6  6  6  6  6 
+    _  0  1  2  3  4  5  6          _  _  7  7  7  7  7  7 
+    0  1  2  3  4  5  6  7          0  0  0  8  8  8  8  8 
+    1  2  3  4  5  6  7  8          1  1  1  1  9  9  9  9
+    2  3  4  5  6  7  8  9          2  2  2  2  2  10 10 10
+    3  4  5  6  7  8  9  10         3  3  3  3  3  3  _  _ 
+    4  5  6  7  8  9  10 _          4  4  4  4  4  4  4  _
+    5  6  7  8  9  10 _  _          5  5  5  5  5  5  5  5
+
+
+
+    the 11 key anti diagonals are similarly defined:
+    
+    
+    5  4  3  2  1  0  _  _          5  5  5  5  5  5  5  5
+    6  5  4  3  2  1  0  _          6  6  6  6  6  6  6  _
+    7  6  5  4  3  2  1  0          7  7  7  7  7  7  _  _
+    8  7  6  5  4  3  2  1          8  8  8  8  8  0  0  0 
+    9  8  7  6  5  4  3  2          9  9  9  9  1  1  1  1
+    10 9  8  7  6  5  4  3          10 10 10 2  2  2  2  2
+    _  10 9  8  7  6  5  4          _  _  3  3  3  3  3  3 
+    _  _  10 9  8  7  6  5          _  4  4  4  4  4  4  4
+
+the anti diagonals can be obtained by taking the diagonal of the horizontal flip. diagonals are indexed from 0-10
+
+
+    unsigned long black =   0b0000000000000000000001010001000100001000100000000000000000000000;
+    unsigned long white =   0b0000000010000000000000001000000010010000000010000000000000000000; 
+    //unsigned long x = 0b0001110000010010000100100001110000010000000100000001000000010000; //P
+    //unsigned long white = 0b0001110000010010000100100001110000011000000101000001001000010010; //R
+    //unsigned long x = 0b1000000001000000001000000001000000001000000001000000001000000001; //slash
+    //unsigned long white = 0b0101010000100100000100101000101000101001000001010101101010000000;
+    //unsigned long black = 0b1010000010010011110010010011010101010100101000000010010000000000;
+    //unsigned long white = 0b0000000000000000000000000001000000001000000000000000000000000000; //actual board start
+    //unsigned long black = 0b0000000000000000000000000000100000010000000000000000000000000000; // actual board start
+    //unsigned long white = 0x0040000000000200; // main diagonal tests
+    //unsigned long black = 0x0000201008040000; //main diagonal tests
+    //unsigned long white = 0x0010000002000000; // d2
+    //unsigned long black = 0x0000080400000000; //  d2
+    //unsigned long black = 0xff00080808084000;
+    //unsigned long white = 0x0024000400008400;
+    //unsigned long white = flipH(0x0020000000020000); // d1 diagonal tests
+    //unsigned long black = (0x0000100804000000); //d1 diagonal tests
+    //unsigned long white = 0x0008000200000000; // d3
+    //unsigned long black = 0x0000040000000000; //  d3
+    //unsigned long white = 0x0004000000000000; // d4
+    //unsigned long black = 0x0000020000000000; //  d4
+
+
+m_button1.set_image_from_icon_name("go-next");
+  m_button2.set_image_from_icon_name("go-previous");
+    m_button1.signal_clicked().connect(sigc::mem_fun(*this, &Othello::on_button_clicked));
+    m_button[i + 8*j].signal_clicked().connect(sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &Othello::on_button_clicked), std::to_string(63 - i - 8*j)) );
+
+    for (int j = 0; j < 8; j ++){
+    for (int i = 0; i < 8; i ++) {
+      m_button[i + 8*j].set_label(std::to_string(63 - i - 8*j));
+      //gtk_widget_set_opacity(&m_button[i + 8*j],0.5);
+      m_grid.attach(m_button[i + 8*j], i, j);
+      m_button[i + 8*j].signal_clicked().connect(sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &Othello::on_button_clicked), std::to_string(63 - i - 8*j)) );
+      m_button[i + 8*j].set_can_focus(false);
+      m_button[i + 8*j].set_border_width(0);
+      m_button[i + 8*j].set_alignment(0, 0);
+      m_button[i + 8*j].set_property("relief", 2);
+      //m_button[i + 8*j].set_property("opacity", 0.2);
+    }
+  }
+
+
+features to add /////
+- be able to move back through previous moves
+- show move history
+
+---->the bot<----
